@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bức Thư Tình Cảm Cuối Cùng</title>
+    <!-- Font chữ (Montserrat và Playfair Display) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Icon Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* --- CSS VARIABLES VÀ GLOBAL STYLES --- */
+        :root {
+            /* Tông màu cân bằng, dịu nhẹ (Pastel Blue & Soft Grey) */
+            --primary-color: #778899; /* Xám xanh dịu (Slate Gray) */
+            --secondary-color: #B0C4DE; /* Xanh pastel (Light Steel Blue) */
+            --accent-color: #D3D3D3; /* Xám nhạt */
+            --text-dark: #3a3a3a; 
+            --text-light: #6a6a6a;
+            --background-soft: #F0F5F5; /* Nền trắng ngà/xanh nhạt */
+            --paper-color: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-soft);
+            color: var(--text-dark);
+            overflow-x: hidden; 
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; 
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            padding-bottom: 50px; 
+        }
+
+        /* --- ENVELOPE (PHONG BÌ) --- */
+        .envelope-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--background-soft); 
+            z-index: 50; 
+        }
+        
+        /* Cập nhật style envelope để trông đẹp hơn */
+        .envelope {
+            width: 100px;
+            height: 70px;
+            background-color: var(--secondary-color);
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease;
+            animation: bounceIn 1.2s ease-out forwards;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            60% { transform: scale(1.1); opacity: 1; }
+            80% { transform: scale(0.95); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .envelope:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+        }
+
+        .letter-icon {
+            font-size: 2.5em;
+            color: var(--paper-color);
+        }
+
+        .instruction-text {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: var(--text-light);
+            font-style: italic;
+            opacity: 0;
+            animation: fadeInText 1s ease-out 1.5s forwards;
+        }
+
+        @keyframes fadeInText {
+            to { opacity: 1; }
+        }
+
+        /* --- TẤT CẢ CÁC TRANG NỘI DUNG (Letter, Advice, Wishes, Thank You) --- */
+        .content-page {
+            background-color: var(--paper-color);
+            max-width: 650px;
+            width: 100%;
+            min-height: 500px;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            margin: 20px auto; 
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-out;
+            z-index: 20;
+            box-sizing: border-box;
+            text-align: left; 
+        }
+        
+        .content-page.is-visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Ẩn ban đầu bằng JS, nhưng CSS chuẩn bị hiệu ứng */
+        .initial-hidden { display: none; }
+
+        /* --- LETTER CONTENT (TRANG CHÍNH) --- */
+        .letter-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2em;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center; 
+        }
+
+        .letter-paragraph {
+            font-size: 1em;
+            color: var(--text-dark);
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        
+        .image-caption {
+            font-style: italic;
+            color: var(--text-light);
+            margin-bottom: 5px; 
+            text-align: center;
+        }
+        
+        /* START: SỬA ĐỔI CHO ẢNH RÕ RÀNG HƠN (ĐÃ TĂNG CHIỀU CAO VÀ THAY ĐỔI OBJECT-FIT) */
+        .letter-image-container {
+            width: 100%;
+            /* Tăng chiều cao tối đa để ảnh có thêm không gian hiển thị */
+            max-height: 450px; 
+            overflow: hidden; 
+            margin-bottom: 30px;
+            margin-top: 15px; 
+            border-radius: 10px; 
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--accent-color); /* Thêm nền để thấy rõ object-fit: contain */
+        }
+
+        .letter-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            /* Thay đổi từ 'cover' sang 'contain' để toàn bộ ảnh (bao gồm khuôn mặt) hiển thị mà không bị cắt */
+            object-fit: contain; 
+            border-radius: 10px; 
+            transition: transform 0.5s ease;
+        }
+        /* END: SỬA ĐỔI CHO ẢNH RÕ RÀNG HƠN */
+
+        .letter-image-container:hover .letter-image {
+            transform: scale(1.03); 
+        }
+
+        .final-words {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 30px; 
+            text-align: center;
+            font-style: italic;
+        }
+
+        .signature {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1em;
+            font-style: italic;
+            color: var(--text-light);
+            margin-top: 20px;
+            text-align: right;
+            display: block;
+        }
+
+        /* --- INTERACTIVE ICONS --- */
+        .interaction-icons {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--accent-color);
+        }
+
+        .icon-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-light);
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        .icon-link i {
+            font-size: 2.5em;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+
+        .icon-link:hover {
+            color: var(--primary-color);
+            transform: translateY(-5px);
+        }
+
+        .icon-link:hover i {
+            color: var(--primary-color);
+        }
+        
+        /* --- SUB PAGES (ADVICE & WISHES & THANK YOU) --- */
+        .sub-page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8em;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        
+        .sub-page-content {
+            text-align: left;
+            margin-bottom: 40px;
+        }
+        
+        .sub-page-content ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .sub-page-content li {
+            background-color: var(--background-soft);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--secondary-color);
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+            word-wrap: break-word; 
+        }
+        
+        .sub-page-content li:hover {
+            transform: translateX(5px);
+        }
+
+        /* --- BUTTONS --- */
+        .action-button {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(121, 85, 72, 0.3);
+            width: 100%; 
+        }
+
+        .action-button.back-button {
+            background-color: var(--secondary-color);
+            margin-top: 0;
+        }
+
+        .action-button.back-button:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .action-button:hover {
+            background-color: #5D4037;
+            transform: translateY(-2px);
+        }
+        
+        /* --- FINAL MESSAGE STYLE --- */
+        .final-message {
+            background-color: var(--paper-color);
+            padding: 50px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: fixed; 
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s ease-out;
+            z-index: 50; 
+            max-width: 400px;
+        }
+
+        .final-message.is-visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- ĐIỀU CHỈNH RESPONSIVE CHO DI ĐỘNG --- */
+        
+        /* Điều chỉnh cho máy tính bảng và màn hình nhỏ hơn 768px */
+        @media (max-width: 768px) {
+            .content-page {
+                max-width: 95%;
+                padding: 25px;
+                min-height: auto; 
+                margin: 20px auto; 
+            }
+            .letter-title {
+                font-size: 1.8em;
+            }
+        }
+        
+        /* Điều chỉnh chuyên biệt cho điện thoại di động (nhỏ hơn 480px) */
+        @media (max-width: 480px) {
+            .content-page {
+                padding: 20px; 
+            }
+            .letter-title {
+                font-size: 1.6em; 
+            }
+            .sub-page-title {
+                font-size: 1.5em; 
+            }
+            .letter-paragraph {
+                font-size: 0.9em; 
+            }
+            .interaction-icons {
+                gap: 15px; 
+            }
+            .icon-link i {
+                font-size: 2em; 
+            }
+            .action-button {
+                padding: 10px 20px; 
+            }
+            .final-message {
+                max-width: 90%;
+                padding: 30px;
+            }
+            h3 {
+                text-align: center;
+                font-size: 1em;}
+        }
+    </style>
+</head>
+<body>
+    <audio id="backgroundMusic" autoplay loop>
+    <source src="Adkbcye.mp3" type="audio/mpeg">
+    </audio>
+    <div class="content-wrapper">
+        <!-- 1. ENVELOPE (PHONG BÌ - Giai đoạn 1) -->
+        <div class="envelope-container">
+            <div id="envelope" class="envelope">
+                <i class="fas fa-envelope letter-icon"></i>
+            </div>
+            <p class="instruction-text editable">Nhấp vào bức thư để mở...</p>
+        </div>
+
+        <!-- 2. MAIN LETTER CONTENT (TRANG CHÍNH - Giai đoạn 2) -->
+        <div id="letterContent" class="content-page initial-hidden">
+            <header>
+                <h1 class="editable letter-title">Nhừng lời nói cuối cùng</h1>
+            </header>
+            
+            <p class="image-caption editable" style="font-weight: bold;">Gửi em : Người anh yêu thương</p>
+            <h3 class="image-caption editable">(Cao Thị Thanh Hà)</h3>
+            <h3 class="image-caption editable">(14 - 03 - 2008)</h3>
+            <!-- VỊ TRÍ CHÈN ẢNH KỶ NIỆM MỚI -->
+            <div class="letter-image-container">
+                <!-- Đã cập nhật src sang ảnh đã tải lên để hiển thị -->
+                <img src="ctth.jpg" alt="" class="letter-image">
+            </div>
+
+            <p class="editable letter-paragraph">
+                Anh đã viết những dòng này khi anh đã nghĩ kĩ càng rồi.
+                Tình cảm phải đến từ hai phía nhưng bây giờ anh cảm thấy nó đến từ một phía thôi.ppppppppppppppppppppppppppppppppppppp
+                Đâu ai muốn dừng lại một mối quan hệ khi nó vẫn còn thương đâu em nhỉ?             
+                Nhưng thương từ một phía nó vô nghĩa lắm.
+                Em đâu còn thương anh đâu, chỉ anh còn thương em thôi.
+                Dù sao anh vẫn luôn cầu chúc cho em mọi điều tốt đẹp nhất.
+                Anh không thể ích kĩ giữ em bên cạnh anh được nữa.
+                Em còn có thanh xuân còn có ước mơ nữa.
+                Anh đâu thể để một người tệ như anh làm ảnh hưởng tới cuộc sống và ước mơ của em được.
+                Anh xin lỗi vì đã làm em tổn thương.
+                Anh xin lỗi vì đã không thể mang lại hạnh phúc cho em.   
+                Anh xin lỗi vì đã không thể làm em vui.
+                Anh xin lỗi vì đã không thể làm em hạnh phúc.
+                Anh xin lỗi vì đã không thể làm em cảm thấy an toàn.
+                Anh xin lỗi vì đã không thể thực hiện lời hứa đi cùng em đến lúc em hết bệnh.
+                Yêu em nhiều lắm chứ nhưng có lẽ anh không biết cách để yêu em.
+            </p>
+            
+            <p class="editable final-words">
+                Hãy bình an và sống một cuộc sống thật ý nghĩa nhé.
+            </p>
+            
+            <p class="signature editable">— Người đã từng rất yêu em.</p>
+
+            <!-- ICON INTERACTION - ĐÃ THÊM LỜI CẢM ƠN -->
+            <div class="interaction-icons">
+                <a class="icon-link" id="adviceLink">
+                    <i class="fas fa-book-open"></i>
+                    <span>Lời Dặn Dò</span>
+                </a>
+                <a class="icon-link" id="wishesLink">
+                    <i class="fas fa-heart"></i>
+                    <span>Lời Chúc</span>
+                </a>
+                <a class="icon-link" id="thankYouLink"> 
+                    <i class="fas fa-hand-holding-heart"></i>
+                    <span>Lời Cảm Ơn</span>
+                </a>
+            </div>
+
+            <button id="closeLetterButton" class="action-button">Chấp nhận và Buông bỏ</button>
+        </div>
+
+        <!-- 3. ADVICE PAGE (TRANG DẶN DÒ - Giai đoạn 3a) -->
+        <div id="advicePage" class="content-page initial-hidden">
+            <h2 class="sub-page-title editable">Dặn Dò Của Người Đã Từng Yêu</h2>
+            
+            <div class="sub-page-content">
+                <ul>
+                    <li class="editable">**Dành thời gian cho bản thân:** Đừng suy nghĩ tiêu cực nữa , suy nghĩ ít thôi .</li>
+                    <li class="editable">**Dành thời gian cho gia đình/bạn bè:** Lúc đó tâm trạng em sẽ ổn hơn.</li>
+                    <li class="editable">**Ráng học nha :** Em còn ước mơ đi du học nữa đó . Cố lên !.</li>
+                    <li class="editable">**Phải nghe lời ba mẹ nha :** Lớn rồi đừng làm ba mẹ buồn.</li>
+                    <li class="editable">**Chăm sóc sức khỏe của mình nha:** Ăn uống đúng giờ ,uống thuốc đúng cử, ngủ đủ giấc, hạn chế ăn mì cay nha em đang bị dạ dày á.</li>
+                    <li class="editable">**Nếu có khó khăn hay dì đó:** Gọi hay nhắn anh anh sẽ giúp hết sức có thể.</li>
+                </ul>
+            </div>
+
+            <button id="backFromAdvice" class="action-button back-button">Quay lại bức thư</button>
+        </div>
+
+        <!-- 4. WISHES PAGE (TRANG LỜI CHÚC - Giai đoạn 3b) -->
+        <div id="wishesPage" class="content-page initial-hidden">
+            <h2 class="sub-page-title editable">Những Lời Chúc Chân Thành Nhất</h2>
+            
+            <div class="sub-page-content">
+                <ul>
+                    <li class="editable">**Chúc em hạnh phúc với người em đã chọn :** Người hiểu và yêu thương em một cách trọn vẹn.</li>
+                    <li class="editable">**Chúc em thành công trong việc học tập nha :** Đạt được danh hiệu học sinh xuất sắc với giỏi nha.</li>
+                    <li class="editable">**Chúc em luôn có nhiều niềm vui:** Em chịu nhiều nỗi buồn rồi, bây giờ là lúc em được hưởng niềm vui trọn vẹn.</li>
+                    <li class="editable">**Chúc em sống một đời bình yên:** Không còn muộn phiền, không còn hối tiếc, chỉ còn sự an lành trong tâm hồn.</li>
+                </ul>
+            </div>
+
+            <button id="backFromWishes" class="action-button back-button">Quay lại bức thư</button>
+        </div>
+
+        <!-- 5. THANK YOU PAGE (TRANG CẢM ƠN - Giai đoạn 3c) -->
+        <div id="thankYouPage" class="content-page initial-hidden">
+            <h2 class="sub-page-title editable">Lời Cảm Ơn Chân Thành Nhất</h2>
+            
+            <div class="sub-page-content">
+                <ul>
+                    <li class="editable">**Cảm ơn những kỷ niệm:** Cảm ơn em vì đã cho anh có những kỉ niệm đẹp, dù giờ phải khép lại. Anh sẽ giữ gìn kỉ niệm ấy trong tim anh.</li>
+                    <li class="editable">**Cảm ơn vì em đã đến:** Nhờ có em, mà anh mới có được cảm giác được một người quan tâm, lo lắng, chăm sóc rồi yêu thương anh.</li>
+                    <li class="editable">**Cảm ơn vì đã là em:** Cảm ơn vì em đã từng là một phần quan trọng trong cuộc đời anh. Chúc em luôn hạnh phúc và bình an trong cuộc sống em nhé!</li>
+                </ul>
+            </div>
+
+            <button id="backFromThankYou" class="action-button back-button">Quay lại bức thư</button>
+        </div>
+        
+        <!-- 6. FINAL MESSAGE (TRANG KẾT THÚC) -->
+        <div id="finalMessage" class="final-message initial-hidden">
+            <i class="fas fa-handshake-slash" style="font-size: 3em; color: var(--primary-color);"></i>
+            <h2 style="margin-top: 15px; font-family: 'Playfair Display', serif; color: var(--primary-color);">Mọi chuyện đã kết thúc.</h2>
+            <p style="color: var(--text-dark);">Bức thư đã được **chấp nhận và buông bỏ**. Chúc em một khởi đầu mới bình yên. Cảm ơn em người con gái anh yêu thương❤️</p>
+        </div>
+
+    </div>
+
+    <script>
+        // --- KỊCH BẢN JAVASCRIPT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const envelope = document.getElementById('envelope');
+            const envelopeContainer = document.querySelector('.envelope-container');
+            const letterContent = document.getElementById('letterContent');
+            const advicePage = document.getElementById('advicePage');
+            const wishesPage = document.getElementById('wishesPage');
+            const thankYouPage = document.getElementById('thankYouPage'); 
+            const finalMessage = document.getElementById('finalMessage'); 
+
+            const adviceLink = document.getElementById('adviceLink');
+            const wishesLink = document.getElementById('wishesLink');
+            const thankYouLink = document.getElementById('thankYouLink'); 
+            
+            const backFromAdvice = document.getElementById('backFromAdvice');
+            const backFromWishes = document.getElementById('backFromWishes');
+            const backFromThankYou = document.getElementById('backFromThankYou'); 
+            
+            const closeLetterButton = document.getElementById('closeLetterButton');
+
+            // Hàm chuyển đổi giữa các trang
+            function switchPage(hidePage, showPage) {
+                if (hidePage) {
+                    hidePage.classList.remove('is-visible');
+                    // Đợi transition ẩn kết thúc mới hiển thị trang mới để đảm bảo hiệu ứng mượt
+                    setTimeout(() => {
+                        hidePage.classList.add('initial-hidden');
+                        if (showPage) {
+                            showPage.classList.remove('initial-hidden');
+                            showPage.classList.add('is-visible');
+                            // Cuộn lên đầu trang mới (quan trọng vì bây giờ không dùng absolute positioning)
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                    }, 600);
+                } else if (showPage) {
+                     // Trường hợp đặc biệt: Hiển thị trang đầu tiên (Letter)
+                    showPage.classList.remove('initial-hidden');
+                    showPage.classList.add('is-visible');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+
+            // 1. Mở thư (Envelope -> Main Letter)
+            envelope.addEventListener('click', () => {
+    // Phát nhạc khi người dùng nhấp mở thư
+    const music = document.getElementById('backgroundMusic');
+    music.play().catch(err => console.log("Tự động phát bị chặn:", err));
+
+    envelopeContainer.style.opacity = '0';
+    envelopeContainer.style.transform = 'scale(0.8)';
+
+    setTimeout(() => {
+        envelopeContainer.style.display = 'none'; 
+        switchPage(null, letterContent); 
+    }, 500);
+});
+
+
+            // 2. Chuyển sang trang Dặn Dò
+            adviceLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchPage(letterContent, advicePage);
+            });
+
+            // 3. Chuyển sang trang Lời Chúc
+            wishesLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchPage(letterContent, wishesPage);
+            });
+
+            // 4. Chuyển sang trang Cảm Ơn
+            thankYouLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchPage(letterContent, thankYouPage);
+            });
+
+
+            // 5. Quay lại từ Dặn Dò
+            backFromAdvice.addEventListener('click', () => {
+                switchPage(advicePage, letterContent);
+            });
+
+            // 6. Quay lại từ Lời Chúc
+            backFromWishes.addEventListener('click', () => {
+                switchPage(wishesPage, letterContent);
+            });
+            
+            // 7. Quay lại từ Cảm Ơn
+            backFromThankYou.addEventListener('click', () => {
+                switchPage(thankYouPage, letterContent);
+            });
+
+
+            // 8. Hành động kết thúc (Chấp nhận và Buông bỏ)
+            closeLetterButton.addEventListener('click', () => {
+                const activePage = document.querySelector('.content-page.is-visible');
+                if (activePage) {
+                    // Ẩn trang đang hiển thị
+                    activePage.classList.remove('is-visible');
+                    
+                    setTimeout(() => {
+                        activePage.classList.add('initial-hidden');
+                        
+                        // Hiển thị thông báo kết thúc mới
+                        finalMessage.classList.remove('initial-hidden');
+                        finalMessage.classList.add('is-visible');
+                        
+                        // Quan trọng: Cuộn lên đầu để đảm bảo message fixed luôn ở giữa màn hình.
+                        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+                    }, 600); // Đợi cho trang thư chính ẩn đi
+                }
+            });
+        });
+    </script>
+</body>
+</html>
